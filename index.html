@@ -3,338 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UBR Bank — Diamond Ledger</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<title>UBR Bank — United Biomes Reserve</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0f;--bg2:#0f0f1a;--bg3:#141428;--card:#13132a;--card2:#0d0d1e;
-  --border:#1e1e3e;--border2:#2a2a4e;
-  --dia:#64dfdf;--dia2:#3ab8b8;--dia3:#1a7a7a;
-  --gold:#ffd700;--gold2:#c9a800;
-  --acc:#e94560;--acc2:#a02030;
-  --green:#4caf50;--green2:#2d7a30;
-  --txt:#d0d0e8;--txt2:#7070a0;--txt3:#4a4a6a;
-  --font-mono:'Share Tech Mono',monospace;
-  --font-display:'Orbitron',sans-serif;
+  --navy:#0d1b3e;--navy2:#162040;--navy3:#1c2a52;--navy4:#243060;
+  --red:#c8102e;--red2:#a00d24;
+  --gold:#c9a84c;--gold2:#e8c46a;--gold3:#f5d98a;
+  --white:#ffffff;--off:#f4f6fa;--off2:#e8ecf4;
+  --txt:#1a1a2e;--txt2:#4a5568;--txt3:#718096;
+  --border:#d1d9e6;--border2:#b8c4d8;
+  --green:#1a7a3c;--green2:#e8f5ed;
+  --acc-red:#fdf2f4;
+  --font:'Source Sans 3',sans-serif;
+  --font-serif:'Merriweather',serif;
 }
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--font-mono)}
-body{display:flex;flex-direction:column;min-height:100vh}
-
-/* scanline overlay */
-body::before{
-  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
-  pointer-events:none;z-index:999
+html,body{height:100%;background:var(--off);color:var(--txt);font-family:var(--font)}
+.topbar{
+  background:var(--navy);height:56px;display:flex;align-items:center;
+  padding:0 2rem;position:sticky;top:0;z-index:100;
+  border-bottom:3px solid var(--gold)
 }
-
-.app{max-width:900px;margin:0 auto;padding:1.5rem;width:100%;flex:1}
-
-/* header */
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border2)}
-.logo{font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--dia);letter-spacing:3px;text-shadow:0 0 20px rgba(100,223,223,.3)}
-.logo span{color:var(--txt2);font-size:.6rem;display:block;letter-spacing:4px;font-weight:400;margin-top:2px}
-.header-stats{text-align:right;font-size:.7rem;color:var(--txt2)}
-.header-stats .big{font-size:1.1rem;color:var(--dia);font-family:var(--font-display)}
-
-/* tabs */
-.tabs-section{margin-bottom:1rem}
-.tabs-label{font-size:.6rem;letter-spacing:3px;color:var(--txt3);text-transform:uppercase;margin-bottom:.6rem}
-.tabs-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.tab{
-  padding:6px 16px;border-radius:4px;
-  border:1px solid var(--border2);
-  background:transparent;color:var(--txt2);
-  cursor:pointer;font-size:.7rem;font-family:var(--font-mono);
-  letter-spacing:1px;text-transform:uppercase;
-  transition:all .15s;position:relative;
-}
-.tab:hover{border-color:var(--dia3);color:var(--dia)}
-.tab.active{
-  background:var(--dia3);color:var(--dia);
-  border-color:var(--dia2);
-  text-shadow:0 0 8px rgba(100,223,223,.5)
-}
-.tab.has-loan::after{
-  content:'LOAN';position:absolute;top:-6px;right:-4px;
-  font-size:8px;background:var(--gold2);color:#0a0a0f;
-  padding:1px 4px;border-radius:2px;font-weight:700;letter-spacing:1px
-}
-.tab-add{
-  padding:6px 12px;border-radius:4px;
-  border:1px dashed var(--border2);
-  background:transparent;color:var(--txt3);
-  cursor:pointer;font-size:1rem;font-family:var(--font-mono);
-  transition:all .15s
-}
-.tab-add:hover{border-color:var(--gold2);color:var(--gold)}
-
-/* main content */
-.main{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.main.full{grid-template-columns:1fr}
-
-/* panels */
-.panel{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:6px;padding:1.25rem
-}
-.panel-title{
-  font-size:.6rem;letter-spacing:3px;color:var(--txt2);
-  text-transform:uppercase;margin-bottom:1rem;
-  display:flex;align-items:center;gap:8px
-}
-.panel-title::before{content:'//';color:var(--dia3)}
-
-/* stat cards */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;grid-column:1/-1}
-.stat{
-  background:var(--card2);border:1px solid var(--border);
-  border-radius:4px;padding:12px
-}
-.stat-label{font-size:.6rem;letter-spacing:2px;color:var(--txt2);text-transform:uppercase;margin-bottom:6px}
-.stat-val{font-size:1.3rem;font-family:var(--font-display);font-weight:700}
-.stat-val.dia{color:var(--dia);text-shadow:0 0 10px rgba(100,223,223,.2)}
-.stat-val.acc{color:var(--acc)}
-.stat-sub{font-size:.65rem;color:var(--txt2);margin-top:4px}
-.interest-tag{
-  display:inline-block;margin-top:4px;
-  font-size:.6rem;padding:2px 8px;border-radius:20px;
-  background:rgba(76,175,80,.1);color:var(--green);
-  border:1px solid rgba(76,175,80,.2);letter-spacing:1px
-}
-
-/* forms */
-.field{margin-bottom:.75rem}
-.field label{display:block;font-size:.6rem;letter-spacing:2px;color:var(--txt2);text-transform:uppercase;margin-bottom:6px}
-input[type=number],input[type=text]{
-  width:100%;background:var(--card2);
-  border:1px solid var(--border2);border-radius:4px;
-  padding:9px 12px;color:var(--txt);font-family:var(--font-mono);
-  font-size:.85rem;outline:none;transition:border .15s
-}
-input:focus{border-color:var(--dia2)}
+.topbar-logo{display:flex;align-items:center;gap:12px}
+.logo-box{background:var(--red);color:var(--white);font-weight:700;font-size:1rem;padding:5px 10px;border-radius:3px;letter-spacing:1px;font-family:var(--font-serif)}
+.logo-text{color:var(--white);line-height:1.1}
+.logo-title{font-size:.95rem;font-weight:600;letter-spacing:.5px}
+.logo-sub{font-size:.6rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.topbar-right{margin-left:auto;display:flex;gap:8px}
+.topbar-btn{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);padding:6px 14px;border-radius:3px;cursor:pointer;font-family:var(--font);font-size:.75rem;transition:all .15s}
+.topbar-btn:hover{background:rgba(255,255,255,.1);color:var(--white)}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:230px;background:var(--navy2);flex-shrink:0;border-right:1px solid var(--navy4);padding:1.5rem 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-label{font-size:.6rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;padding:0 1.25rem;margin-bottom:.5rem}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;cursor:pointer;color:rgba(255,255,255,.65);font-size:.85rem;transition:all .15s;border-left:3px solid transparent}
+.sidebar-item:hover{background:rgba(255,255,255,.05);color:var(--white)}
+.sidebar-item.active{background:rgba(200,16,46,.15);color:var(--white);border-left:3px solid var(--red)}
+.sidebar-item .icon{font-size:.9rem;width:18px;text-align:center}
+.sidebar-add{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;cursor:pointer;color:var(--gold);font-size:.8rem;transition:all .15s;border:1px dashed rgba(201,168,76,.3);margin:.75rem 1rem 0;border-radius:4px;justify-content:center}
+.sidebar-add:hover{background:rgba(201,168,76,.1)}
+.main{flex:1;padding:2rem;max-width:900px}
+.welcome-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);border-radius:6px;padding:1.5rem 2rem;margin-bottom:1.5rem;border:1px solid var(--navy4);display:flex;justify-content:space-between;align-items:center}
+.wb-title{color:rgba(255,255,255,.55);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.wb-name{color:var(--white);font-size:1.4rem;font-weight:700}
+.wb-sub{color:var(--gold);font-size:.72rem;margin-top:4px}
+.wb-right{text-align:right}
+.wb-balance-label{color:rgba(255,255,255,.5);font-size:.65rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.wb-balance{color:var(--gold2);font-size:1.8rem;font-weight:700;font-family:var(--font-serif)}
+.cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.card{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem}
+.card.points{border-top:3px solid var(--gold)}
+.card-label{font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt3);margin-bottom:6px}
+.card-val{font-size:1.2rem;font-weight:700}
+.card-val.green{color:var(--green)}
+.card-val.red{color:var(--red)}
+.card-val.gold{color:var(--gold)}
+.card-sub{font-size:.68rem;color:var(--txt3);margin-top:4px}
+.points-badge{display:inline-block;background:var(--navy);color:var(--gold);font-size:.6rem;padding:2px 8px;border-radius:20px;margin-top:6px;font-weight:600;letter-spacing:1px}
+.panels-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.panel.full{grid-column:1/-1}
+.panel-header{background:var(--off);border-bottom:1px solid var(--border);padding:.75rem 1.25rem;font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ph-left{display:flex;align-items:center;gap:8px}
+.ph-icon{color:var(--red)}
+.panel-body{padding:1.25rem}
+.field{margin-bottom:.85rem}
+.field label{display:block;font-size:.7rem;font-weight:600;color:var(--txt2);margin-bottom:5px}
+input[type=number],input[type=text]{width:100%;background:var(--white);border:1px solid var(--border2);border-radius:4px;padding:9px 12px;color:var(--txt);font-family:var(--font);font-size:.9rem;outline:none;transition:border .15s}
+input:focus{border-color:var(--navy3);box-shadow:0 0 0 3px rgba(13,27,62,.07)}
 input::placeholder{color:var(--txt3)}
-
-.btn{
-  width:100%;padding:10px;border-radius:4px;border:none;
-  cursor:pointer;font-family:var(--font-display);font-size:.65rem;
-  font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  transition:all .15s
-}
-.btn-deposit{background:var(--dia3);color:var(--dia);border:1px solid var(--dia2)}
-.btn-deposit:hover{background:var(--dia2);color:#0a0a0f}
-.btn-withdraw{background:transparent;border:1px solid var(--acc2);color:var(--acc)}
-.btn-withdraw:hover{background:var(--acc2);color:var(--txt)}
-.btn-loan{background:rgba(255,215,0,.1);border:1px solid var(--gold2);color:var(--gold)}
-.btn-loan:hover{background:var(--gold2);color:#0a0a0f}
-.btn-repay{background:transparent;border:1px solid var(--gold2);color:var(--gold)}
-.btn-repay:hover{background:var(--gold2);color:#0a0a0f}
-.btn-danger{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-size:.6rem;padding:6px}
-.btn-danger:hover{border-color:var(--acc);color:var(--acc)}
-
-/* loan panel */
-.loan-block{
-  background:rgba(255,215,0,.03);border:1px solid rgba(255,215,0,.15);
-  border-radius:4px;padding:12px;margin-bottom:1rem;grid-column:1/-1
-}
-.loan-block-title{font-size:.6rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
-.loan-detail{font-size:.8rem;color:var(--txt);margin-bottom:4px}
-.loan-owed{font-size:1.1rem;font-family:var(--font-display);color:var(--gold);margin:6px 0}
-.loan-warning{font-size:.65rem;color:var(--acc);margin-top:4px}
-
-/* history */
-.history-wrap{overflow-y:auto;max-height:240px}
-.history-wrap::-webkit-scrollbar{width:3px}
-.history-wrap::-webkit-scrollbar-track{background:var(--card2)}
-.history-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.h-row{
-  display:grid;grid-template-columns:auto 1fr auto auto;
-  gap:8px;align-items:center;
-  padding:7px 0;border-bottom:1px solid var(--border);font-size:.75rem
-}
-.h-row:last-child{border-bottom:none}
-.h-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.h-dot.dep{background:var(--dia)}
-.h-dot.wd{background:var(--acc)}
-.h-dot.int{background:var(--gold)}
-.h-dot.loan{background:var(--gold);opacity:.6}
-.h-dot.repay{background:var(--acc);opacity:.6}
-.h-label{color:var(--txt)}
-.h-amt{text-align:right;font-family:var(--font-display);font-size:.7rem}
-.h-amt.pos{color:var(--dia)}
-.h-amt.neg{color:var(--acc)}
-.h-amt.gold{color:var(--gold)}
-.h-date{color:var(--txt3);font-size:.65rem;text-align:right;white-space:nowrap}
-.empty-msg{color:var(--txt3);font-size:.75rem;text-align:center;padding:2rem}
-
-/* modal */
-.modal-bg{
-  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.8);z-index:1000;
-  align-items:center;justify-content:center
-}
+.btn{width:100%;padding:10px;border-radius:4px;cursor:pointer;font-family:var(--font);font-size:.78rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;border:none}
+.btn-deposit{background:var(--navy);color:var(--white)}
+.btn-deposit:hover{background:var(--navy3)}
+.btn-withdraw{background:var(--white);border:2px solid var(--red) !important;color:var(--red)}
+.btn-withdraw:hover{background:var(--acc-red)}
+.btn-loan{background:var(--gold);color:var(--navy);font-weight:700}
+.btn-loan:hover{background:var(--gold2)}
+.btn-repay{background:var(--white);border:2px solid var(--gold) !important;color:var(--gold)}
+.btn-repay:hover{background:#fdf8ec}
+.btn-sm{background:none;border:1px solid var(--border2);color:var(--txt3);font-size:.62rem;padding:4px 10px;width:auto;border-radius:3px;cursor:pointer;font-family:var(--font);transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+.btn-sm:hover{border-color:var(--red);color:var(--red)}
+.loan-alert{background:#fffbf0;border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:4px;padding:1rem 1.25rem;margin-bottom:1rem}
+.la-title{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--gold);margin-bottom:6px;letter-spacing:.5px}
+.la-detail{font-size:.82rem;color:var(--txt);margin-bottom:4px}
+.la-owed{font-size:1.1rem;font-weight:700;color:var(--red);margin:4px 0}
+.la-warn{font-size:.68rem;color:var(--txt3)}
+.hist-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.hist-table th{background:var(--off);text-align:left;padding:8px 12px;font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt2);border-bottom:2px solid var(--border);font-weight:700}
+.hist-table td{padding:9px 12px;border-bottom:1px solid var(--off2);color:var(--txt)}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table tr:hover td{background:var(--off)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.62rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.badge-dep{background:#e8f5ed;color:var(--green)}
+.badge-wd{background:var(--acc-red);color:var(--red)}
+.badge-int{background:#fdf8ec;color:#8a6a00}
+.badge-loan{background:#fff3cd;color:#7a5a00}
+.badge-repay{background:var(--off2);color:var(--txt2)}
+.amt-pos{color:var(--green);font-weight:700}
+.amt-neg{color:var(--red);font-weight:700}
+.amt-gold{color:#8a6a00;font-weight:700}
+.hist-scroll{max-height:260px;overflow-y:auto}
+.hist-scroll::-webkit-scrollbar{width:4px}
+.hist-scroll::-webkit-scrollbar-track{background:var(--off)}
+.hist-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.pts-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--off2);font-size:.8rem}
+.pts-row:last-child{border-bottom:none}
+.pts-reason{color:var(--txt)}
+.pts-earned{color:var(--gold);font-weight:700}
+.pts-date{color:var(--txt3);font-size:.68rem}
+.empty-state{text-align:center;padding:5rem 2rem;background:var(--white);border:1px solid var(--border);border-radius:6px}
+.es-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.25}
+.es-title{font-size:1rem;font-weight:600;color:var(--txt2);margin-bottom:.5rem}
+.es-sub{font-size:.82rem;color:var(--txt3)}
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{
-  background:var(--bg3);border:1px solid var(--border2);
-  border-radius:8px;padding:1.5rem;min-width:300px;
-  box-shadow:0 0 40px rgba(100,223,223,.05)
-}
-.modal h3{font-family:var(--font-display);font-size:.85rem;color:var(--dia);margin-bottom:1rem;letter-spacing:2px}
-.modal-btns{display:flex;gap:8px;margin-top:1rem}
-.modal-btns button{flex:1;padding:10px;border-radius:4px;cursor:pointer;font-family:var(--font-display);font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .15s}
-.modal-confirm{background:var(--dia3);color:var(--dia);border:1px solid var(--dia2)}
-.modal-confirm:hover{background:var(--dia2);color:#0a0a0f}
-.modal-cancel{background:transparent;border:1px solid var(--border2);color:var(--txt2)}
-.modal-cancel:hover{border-color:var(--acc2);color:var(--acc)}
-
-/* export/import */
-.toolbar{display:flex;gap:8px;margin-bottom:1rem;justify-content:flex-end}
-.tool-btn{
-  padding:5px 12px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);
-  font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
-  background:transparent;border:1px solid var(--border2);color:var(--txt2);transition:all .15s
-}
-.tool-btn:hover{border-color:var(--dia3);color:var(--dia)}
-
-.no-account{
-  grid-column:1/-1;text-align:center;padding:4rem 2rem;
-  color:var(--txt2);font-size:.85rem
-}
-.no-account .big{font-family:var(--font-display);font-size:1.5rem;color:var(--txt3);margin-bottom:1rem}
+.modal{background:var(--white);border-radius:8px;overflow:hidden;min-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-head{background:var(--navy);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--gold)}
+.modal-head h3{color:var(--white);font-size:.9rem;font-weight:600}
+.modal-body{padding:1.5rem}
+.modal-btns{display:flex;gap:8px;margin-top:1.25rem}
+.modal-btns button{flex:1;padding:10px;border-radius:4px;cursor:pointer;font-family:var(--font);font-size:.78rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .15s}
+.modal-confirm{background:var(--navy);color:var(--white);border:none}
+.modal-confirm:hover{background:var(--navy3)}
+.modal-cancel{background:var(--white);border:1px solid var(--border2);color:var(--txt2)}
+.modal-cancel:hover{border-color:var(--red);color:var(--red)}
+.pts-key{display:flex;gap:1rem;font-size:.7rem;color:var(--txt3);margin-top:6px}
+.pts-key span{display:flex;align-items:center;gap:4px}
+.pts-key b{color:var(--gold)}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    <div class="logo">
-      ◆ UBR BANK
-      <span>universal block reserve · diamond ledger</span>
-    </div>
-    <div class="header-stats">
-      <div id="total-accounts" style="margin-bottom:4px"></div>
-      <div id="total-diamonds"></div>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-box">UBR</div>
+    <div class="logo-text">
+      <div class="logo-title">United Biomes Reserve</div>
+      <div class="logo-sub">Overworld Central Bank</div>
     </div>
   </div>
-
-  <div class="tabs-section">
-    <div class="tabs-label">// player accounts</div>
-    <div class="tabs-row" id="tabs"></div>
-  </div>
-
-  <div class="toolbar">
-    <button class="tool-btn" onclick="exportData()">export save</button>
-    <button class="tool-btn" onclick="document.getElementById('import-file').click()">import save</button>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="exportData()">&#8595; Export Save</button>
+    <button class="topbar-btn" onclick="document.getElementById('import-file').click()">&#8593; Import Save</button>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
   </div>
+</div>
 
+<div class="layout">
+  <div class="sidebar">
+    <div style="margin-bottom:1.25rem">
+      <div class="sidebar-label">Player Accounts</div>
+      <div id="sidebar-accounts"></div>
+      <div class="sidebar-add" onclick="openModal()">+ Open Account</div>
+    </div>
+  </div>
   <div class="main" id="main-content"></div>
 </div>
 
-<!-- modal -->
 <div class="modal-bg" id="modal">
   <div class="modal">
-    <h3 id="modal-title">add player</h3>
-    <div class="field">
-      <label>player name</label>
-      <input type="text" id="modal-input" placeholder="enter username" autocomplete="off" />
+    <div class="modal-head">
+      <div class="logo-box" style="font-size:.8rem;padding:3px 8px">UBR</div>
+      <h3>Open New Account</h3>
     </div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal()">cancel</button>
-      <button class="modal-confirm" onclick="confirmModal()">confirm</button>
+    <div class="modal-body">
+      <div class="field">
+        <label>Player Username</label>
+        <input type="text" id="modal-input" placeholder="Enter Minecraft username" autocomplete="off" />
+      </div>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm" onclick="confirmModal()">Open Account</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-const INTEREST_RATE = 0.03;
-const LOAN_RATE = 0.05;
-const INTEREST_DAYS = 3;
-const STORAGE_KEY = 'ubr_bank_v3';
+const INTEREST_RATE=0.03,LOAN_RATE=0.05,STORAGE_KEY='ubr_bank_v2';
+// migrate old keys
+['ubr_bank_v3','ubr_bank_v4'].forEach(k=>{const d=localStorage.getItem(k);if(d&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,d);}});
+const PTS_DEPOSIT=1,PTS_CHECK=2,PTS_INTEREST=5;
 
-function load(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{accounts:{},active:null}}
-  catch(e){return{accounts:{},active:null}}
-}
+function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{accounts:{},active:null}}catch(e){return{accounts:{},active:null}}}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(db))}
 
-let db = load();
-let active = db.active || null;
+let db=load(),active=db.active||null;
 
 function ts(){return Date.now()}
 function daysElapsed(t){return Math.floor((ts()-t)/86400000)}
 
+function getIntDays(acc){return acc.interestDays||3;}
+
 function applyInterest(acc){
-  if(!acc.lastIntTs) acc.lastIntTs = acc.createdTs||ts();
-  const d = daysElapsed(acc.lastIntTs);
-  const periods = Math.floor(d/INTEREST_DAYS);
-  if(periods>0 && acc.balance>0){
+  const ID=getIntDays(acc);
+  if(!acc.lastIntTs) acc.lastIntTs=acc.createdTs||ts();
+  const d=daysElapsed(acc.lastIntTs),periods=Math.floor(d/ID);
+  if(periods>0&&acc.balance>0){
     for(let i=0;i<periods;i++){
-      const g = Math.floor(acc.balance*INTEREST_RATE);
+      const g=Math.floor(acc.balance*INTEREST_RATE);
       if(g>0){
         acc.balance+=g;
-        acc.history.unshift({t:'interest',a:g,ts:ts(),note:'3% interest'});
+        acc.history.unshift({t:'interest',a:g,ts:ts(),note:'3% interest payout'});
+        acc.points=(acc.points||0)+PTS_INTEREST;
+        acc.pointsHistory=acc.pointsHistory||[];
+        acc.pointsHistory.unshift({reason:'Interest payout',pts:PTS_INTEREST,ts:ts()});
       }
     }
-    acc.lastIntTs+=periods*INTEREST_DAYS*86400000;
+    acc.lastIntTs+=periods*ID*86400000;
   }
   if(acc.loan&&acc.loan.on){
     if(!acc.loan.lastTs) acc.loan.lastTs=acc.loan.startTs;
     const ld=daysElapsed(acc.loan.lastTs);
-    if(ld>0){
-      for(let i=0;i<ld;i++){
-        const f=Math.floor(acc.loan.rem*LOAN_RATE);
-        acc.loan.rem+=f;
-      }
-      acc.loan.lastTs+=ld*86400000;
-    }
+    if(ld>0){for(let i=0;i<ld;i++){acc.loan.rem+=Math.floor(acc.loan.rem*LOAN_RATE);}acc.loan.lastTs+=ld*86400000;}
   }
   return acc;
 }
 
 function daysUntilInt(acc){
-  if(!acc.lastIntTs) return INTEREST_DAYS;
-  const d=daysElapsed(acc.lastIntTs)%INTEREST_DAYS;
-  return d===0?0:INTEREST_DAYS-d;
+  const ID=getIntDays(acc);
+  if(!acc.lastIntTs) return ID;
+  const d=daysElapsed(acc.lastIntTs)%ID;
+  return d===0?0:ID-d;
 }
 
-function totalBalance(){
-  return Object.values(db.accounts).reduce((s,a)=>s+a.balance,0);
+function setDays(n){
+  const v=parseInt(n);
+  if(!v||v<1) return;
+  db.accounts[active].interestDays=v;
+  save();render();
 }
 
-function renderHeader(){
+function renderSidebar(){
+  const el=document.getElementById('sidebar-accounts');
   const names=Object.keys(db.accounts);
-  document.getElementById('total-accounts').textContent=`${names.length} account${names.length!==1?'s':''}`;
-  document.getElementById('total-diamonds').innerHTML=`<span class="big">◆ ${totalBalance().toLocaleString()}</span> total reserves`;
-}
-
-function renderTabs(){
-  const el=document.getElementById('tabs');
-  let html='';
-  Object.keys(db.accounts).forEach(n=>{
-    const acc=db.accounts[n];
-    const hasLoan=acc.loan&&acc.loan.on;
-    html+=`<button class="tab${active===n?' active':''}${hasLoan?' has-loan':''}" onclick="selectTab('${n}')">${n}</button>`;
-  });
-  html+=`<button class="tab-add" onclick="openModal()" title="add player">+</button>`;
-  el.innerHTML=html;
+  if(!names.length){el.innerHTML='<div style="padding:.5rem 1.25rem;font-size:.75rem;color:rgba(255,255,255,.3)">No accounts</div>';return;}
+  el.innerHTML=names.map(n=>{
+    const hasLoan=db.accounts[n].loan&&db.accounts[n].loan.on;
+    return `<div class="sidebar-item${active===n?' active':''}" onclick="selectTab('${n}')">
+      <span class="icon">${hasLoan?'⚠':'◆'}</span><span>${n}</span>
+    </div>`;
+  }).join('');
 }
 
 function selectTab(n){active=n;db.active=n;save();render()}
 
 function render(){
-  renderHeader();
-  renderTabs();
+  renderSidebar();
   const mc=document.getElementById('main-content');
   const names=Object.keys(db.accounts);
-
   if(!names.length){
-    mc.innerHTML=`<div class="no-account"><div class="big">◆ 0</div>no accounts yet — click + to add a player</div>`;
+    mc.innerHTML=`<div class="empty-state"><div class="es-icon">🏦</div><div class="es-title">No accounts yet</div><div class="es-sub">Click "Open Account" in the sidebar to get started</div></div>`;
     return;
   }
   if(!active||!db.accounts[active]) active=names[0];
-
   let acc=JSON.parse(JSON.stringify(db.accounts[active]));
   acc=applyInterest(acc);
+  acc.points=acc.points||0;
+  acc.pointsHistory=acc.pointsHistory||[];
   db.accounts[active]=acc;
   save();
 
@@ -342,87 +268,112 @@ function render(){
   const nextGain=Math.floor(acc.balance*INTEREST_RATE);
   const hasLoan=acc.loan&&acc.loan.on;
 
-  let loanHTML='';
-  if(hasLoan){
-    loanHTML=`
-    <div class="loan-block">
-      <div class="loan-block-title">// active loan</div>
-      <div class="loan-detail">original: ◆ ${acc.loan.orig.toLocaleString()} — issued ${new Date(acc.loan.startTs).toLocaleDateString()}</div>
-      <div class="loan-owed">◆ ${acc.loan.rem.toLocaleString()} currently owed</div>
-      <div class="loan-warning">accruing 5% per real day until repaid</div>
-      <button class="btn btn-repay" style="margin-top:10px;max-width:200px" onclick="repayLoan()">repay full loan</button>
-    </div>`;
-  }
+  const loanHTML=hasLoan?`<div class="loan-alert">
+    <div class="la-title">⚠ Active Loan</div>
+    <div class="la-detail">Original: ◆ ${acc.loan.orig.toLocaleString()} &nbsp;|&nbsp; Issued: ${new Date(acc.loan.startTs).toLocaleDateString()}</div>
+    <div class="la-owed">Currently owed: ◆ ${acc.loan.rem.toLocaleString()}</div>
+    <div class="la-warn">Accruing 5% per real day until repaid</div>
+    <button class="btn btn-repay" style="margin-top:10px;max-width:180px;border:2px solid var(--gold)" onclick="repayLoan()">Repay Full Loan</button>
+  </div>`:'';
 
-  let loanFormHTML='';
-  if(!hasLoan){
-    loanFormHTML=`
-    <div class="panel" style="grid-column:1/-1">
-      <div class="panel-title">issue loan</div>
-      <div class="field">
-        <label>loan amount (diamonds)</label>
-        <input type="number" id="loan-amt" placeholder="0" min="1" />
-      </div>
-      <button class="btn btn-loan" onclick="doLoan()">issue loan — 5%/day ◆</button>
-    </div>`;
-  }
+  const histRows=acc.history.length?acc.history.map(h=>{
+    let badge='',cls='',sign='';
+    if(h.t==='deposit'){badge='<span class="badge badge-dep">Deposit</span>';cls='amt-pos';sign='+'}
+    else if(h.t==='withdraw'){badge='<span class="badge badge-wd">Withdraw</span>';cls='amt-neg';sign='-'}
+    else if(h.t==='interest'){badge='<span class="badge badge-int">Interest</span>';cls='amt-gold';sign='+'}
+    else if(h.t==='loan'){badge='<span class="badge badge-loan">Loan</span>';cls='amt-gold';sign=''}
+    else if(h.t==='repay'){badge='<span class="badge badge-repay">Repaid</span>';cls='amt-neg';sign='-'}
+    return `<tr><td>${badge}</td><td style="color:var(--txt2)">${h.note||''}</td><td class="${cls}">${sign}◆${h.a.toLocaleString()}</td><td style="color:var(--txt3);font-size:.72rem">${new Date(h.ts).toLocaleDateString()}</td></tr>`;
+  }).join(''):`<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--txt3)">No transactions yet</td></tr>`;
 
-  const histHTML=acc.history.length?acc.history.map(h=>{
-    let cls='',dotCls='',sign='',label='';
-    if(h.t==='deposit'){cls='pos';dotCls='dep';sign='+';label='deposit'}
-    else if(h.t==='withdraw'){cls='neg';dotCls='wd';sign='-';label='withdraw'}
-    else if(h.t==='interest'){cls='gold';dotCls='int';sign='+';label='interest'}
-    else if(h.t==='loan'){cls='gold';dotCls='loan';sign='';label='loan issued'}
-    else if(h.t==='repay'){cls='neg';dotCls='repay';sign='-';label='repaid'}
-    return `<div class="h-row">
-      <div class="h-dot ${dotCls}"></div>
-      <div class="h-label">${label}${h.note&&h.t!=='deposit'&&h.t!=='withdraw'?` — ${h.note}`:''}</div>
-      <div class="h-amt ${cls}">${sign}◆${h.a.toLocaleString()}</div>
-      <div class="h-date">${new Date(h.ts).toLocaleDateString()}</div>
-    </div>`;
-  }).join(''):`<div class="empty-msg">no transactions yet</div>`;
+  const ptsRows=acc.pointsHistory.length?acc.pointsHistory.slice(0,15).map(p=>`
+    <div class="pts-row">
+      <span class="pts-reason">${p.reason}</span>
+      <span class="pts-earned">+${p.pts} pts</span>
+      <span class="pts-date">${new Date(p.ts).toLocaleDateString()}</span>
+    </div>`).join(''):`<div style="text-align:center;padding:1.5rem;color:var(--txt3);font-size:.8rem">No points earned yet</div>`;
+
+  const loanForm=!hasLoan?`<div class="panels-row"><div class="panel full">
+    <div class="panel-header"><div class="ph-left"><span class="ph-icon">◆</span>Issue Loan</div></div>
+    <div class="panel-body" style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
+      <div class="field" style="margin:0"><label>Loan Amount (Diamonds)</label><input type="number" id="loan-amt" placeholder="0" min="1"/></div>
+      <button class="btn btn-loan" style="width:auto;padding:10px 24px;white-space:nowrap" onclick="doLoan()">Issue Loan — 5%/day</button>
+    </div>
+  </div></div>`:'';
 
   mc.innerHTML=`
-    <div class="stats-row">
-      <div class="stat">
-        <div class="stat-label">balance</div>
-        <div class="stat-val dia">◆ ${acc.balance.toLocaleString()}</div>
-        <div class="stat-sub">${dLeft===0?'interest due today':`next interest in ${dLeft} day${dLeft!==1?'s':''}`}</div>
-        ${nextGain>0?`<div class="interest-tag">+${nextGain} dia in ${dLeft===0?0:dLeft}d</div>`:''}
+    <div class="welcome-banner">
+      <div>
+        <div class="wb-title">Account Holder</div>
+        <div class="wb-name">${active}</div>
+        <div class="wb-sub">Member since ${new Date(acc.createdTs).toLocaleDateString()}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <span style="font-size:.68rem;color:rgba(255,255,255,.5);letter-spacing:.5px">Interest every</span>
+          <input type="number" min="1" max="365" value="${acc.interestDays||3}" onchange="setDays(this.value)" style="width:52px;padding:4px 8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;color:var(--gold2);font-family:var(--font);font-size:.82rem;text-align:center;outline:none"/>
+          <span style="font-size:.68rem;color:rgba(255,255,255,.5)">days</span>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-label">total deposited</div>
-        <div class="stat-val">◆ ${acc.totalDep.toLocaleString()}</div>
+      <div class="wb-right">
+        <div class="wb-balance-label">Current Balance</div>
+        <div class="wb-balance">◆ ${acc.balance.toLocaleString()}</div>
       </div>
-      <div class="stat">
-        <div class="stat-label">total withdrawn</div>
-        <div class="stat-val acc">◆ ${acc.totalWd.toLocaleString()}</div>
+    </div>
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-label">Balance</div>
+        <div class="card-val green">◆ ${acc.balance.toLocaleString()}</div>
+        <div class="card-sub">${dLeft===0?'Interest due today':`Interest in ${dLeft}d`}${nextGain>0?` (+◆${nextGain})`:''}  </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Deposited</div>
+        <div class="card-val">◆ ${acc.totalDep.toLocaleString()}</div>
+        <div class="card-sub">All time</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Withdrawn</div>
+        <div class="card-val red">◆ ${acc.totalWd.toLocaleString()}</div>
+        <div class="card-sub">All time</div>
+      </div>
+      <div class="card points">
+        <div class="card-label">Reward Points</div>
+        <div class="card-val gold">${acc.points.toLocaleString()} pts</div>
+        <div class="points-badge">UBR REWARDS</div>
       </div>
     </div>
     ${loanHTML}
-    <div class="panel">
-      <div class="panel-title">deposit</div>
-      <div class="field">
-        <label>amount (diamonds)</label>
-        <input type="number" id="dep-amt" placeholder="0" min="1" />
+    <div class="panels-row">
+      <div class="panel">
+        <div class="panel-header"><div class="ph-left"><span class="ph-icon">+</span>Deposit Diamonds</div></div>
+        <div class="panel-body">
+          <div class="field"><label>Amount (Diamonds)</label><input type="number" id="dep-amt" placeholder="0" min="1"/></div>
+          <button class="btn btn-deposit" onclick="doDeposit()">Deposit ◆</button>
+          <div class="pts-key"><span><b>+${PTS_DEPOSIT}</b> pt per deposit</span></div>
+        </div>
       </div>
-      <button class="btn btn-deposit" onclick="doDeposit()">deposit ◆</button>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-left"><span class="ph-icon">-</span>Withdraw Diamonds</div></div>
+        <div class="panel-body">
+          <div class="field"><label>Amount (Diamonds)</label><input type="number" id="wd-amt" placeholder="0" min="1"/></div>
+          <button class="btn btn-withdraw" style="border:2px solid var(--red)" onclick="doWithdraw()">Withdraw ◆</button>
+          <div class="pts-key"><span><b>+${PTS_CHECK}</b> pts per check used</span></div>
+        </div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-title">withdraw</div>
-      <div class="field">
-        <label>amount (diamonds)</label>
-        <input type="number" id="wd-amt" placeholder="0" min="1" />
+    ${loanForm}
+    <div class="panels-row">
+      <div class="panel full">
+        <div class="panel-header">
+          <div class="ph-left"><span class="ph-icon">☰</span>Transaction History</div>
+          <button class="btn-sm" onclick="deleteAccount()">Delete Account</button>
+        </div>
+        <div class="hist-scroll"><table class="hist-table"><thead><tr><th>Type</th><th>Note</th><th>Amount</th><th>Date</th></tr></thead><tbody>${histRows}</tbody></table></div>
       </div>
-      <button class="btn btn-withdraw" onclick="doWithdraw()">withdraw ◆</button>
     </div>
-    ${loanFormHTML}
-    <div class="panel" style="grid-column:1/-1">
-      <div class="panel-title" style="justify-content:space-between">
-        <span>transaction history</span>
-        <button class="btn btn-danger" onclick="deleteAccount()" style="width:auto;padding:4px 10px">delete account</button>
+    <div class="panels-row">
+      <div class="panel full">
+        <div class="panel-header"><div class="ph-left"><span class="ph-icon">★</span>Reward Points History</div><span style="font-size:.68rem;color:var(--txt3)">Dep +${PTS_DEPOSIT} &nbsp;|&nbsp; Check +${PTS_CHECK} &nbsp;|&nbsp; Interest +${PTS_INTEREST}</span></div>
+        <div class="panel-body">${ptsRows}</div>
       </div>
-      <div class="history-wrap">${histHTML}</div>
     </div>
   `;
 }
@@ -431,8 +382,11 @@ function doDeposit(){
   const v=parseInt(document.getElementById('dep-amt').value);
   if(!v||v<1) return;
   const acc=db.accounts[active];
-  acc.balance+=v; acc.totalDep+=v;
+  acc.balance+=v;acc.totalDep+=v;
   acc.history.unshift({t:'deposit',a:v,ts:ts()});
+  acc.points=(acc.points||0)+PTS_DEPOSIT;
+  acc.pointsHistory=acc.pointsHistory||[];
+  acc.pointsHistory.unshift({reason:`Deposit ◆${v.toLocaleString()}`,pts:PTS_DEPOSIT,ts:ts()});
   save();render();
 }
 
@@ -440,9 +394,12 @@ function doWithdraw(){
   const v=parseInt(document.getElementById('wd-amt').value);
   if(!v||v<1) return;
   const acc=db.accounts[active];
-  if(v>acc.balance){alert('not enough diamonds');return;}
-  acc.balance-=v; acc.totalWd+=v;
-  acc.history.unshift({t:'withdraw',a:v,ts:ts()});
+  if(v>acc.balance){alert('Insufficient balance');return;}
+  acc.balance-=v;acc.totalWd+=v;
+  acc.history.unshift({t:'withdraw',a:v,ts:ts(),note:'Check used'});
+  acc.points=(acc.points||0)+PTS_CHECK;
+  acc.pointsHistory=acc.pointsHistory||[];
+  acc.pointsHistory.unshift({reason:`Check used — ◆${v.toLocaleString()}`,pts:PTS_CHECK,ts:ts()});
   save();render();
 }
 
@@ -450,10 +407,10 @@ function doLoan(){
   const v=parseInt(document.getElementById('loan-amt').value);
   if(!v||v<1) return;
   const acc=db.accounts[active];
-  if(acc.loan&&acc.loan.on){alert('already has an active loan');return;}
+  if(acc.loan&&acc.loan.on){alert('Account already has an active loan');return;}
   acc.loan={on:true,orig:v,rem:v,startTs:ts(),lastTs:ts()};
   acc.balance+=v;
-  acc.history.unshift({t:'loan',a:v,ts:ts(),note:'5%/day loan'});
+  acc.history.unshift({t:'loan',a:v,ts:ts(),note:'Loan @ 5%/day'});
   save();render();
 }
 
@@ -461,15 +418,15 @@ function repayLoan(){
   const acc=db.accounts[active];
   if(!acc.loan||!acc.loan.on) return;
   const owed=acc.loan.rem;
-  if(owed>acc.balance){alert(`need ◆${owed.toLocaleString()} but balance is ◆${acc.balance.toLocaleString()}`);return;}
-  acc.balance-=owed; acc.totalWd+=owed;
-  acc.history.unshift({t:'repay',a:owed,ts:ts(),note:'loan fully repaid'});
+  if(owed>acc.balance){alert(`Need ◆${owed.toLocaleString()}, have ◆${acc.balance.toLocaleString()}`);return;}
+  acc.balance-=owed;acc.totalWd+=owed;
+  acc.history.unshift({t:'repay',a:owed,ts:ts(),note:'Loan fully repaid'});
   acc.loan.on=false;
   save();render();
 }
 
 function deleteAccount(){
-  if(!confirm(`permanently delete ${active}?`)) return;
+  if(!confirm(`Permanently delete ${active}?`)) return;
   delete db.accounts[active];
   const rem=Object.keys(db.accounts);
   active=rem.length?rem[0]:null;
@@ -486,36 +443,33 @@ function exportData(){
 }
 
 function importData(e){
-  const file=e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
+  const file=e.target.files[0];if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
     try{
-      const imported=JSON.parse(ev.target.result);
-      if(!imported.accounts) throw new Error('invalid');
-      if(!confirm('this will replace all current data. continue?')) return;
-      db=imported;
-      active=db.active||Object.keys(db.accounts)[0]||null;
+      const imp=JSON.parse(ev.target.result);
+      if(!imp.accounts) throw new Error();
+      if(!confirm('Replace all current data?')) return;
+      db=imp;active=db.active||Object.keys(db.accounts)[0]||null;
       save();render();
-    }catch(err){alert('invalid save file');}
+    }catch{alert('Invalid save file');}
   };
-  reader.readAsText(file);
-  e.target.value='';
+  r.readAsText(file);e.target.value='';
 }
 
 function openModal(){
   document.getElementById('modal-input').value='';
   document.getElementById('modal').classList.add('open');
-  document.getElementById('modal-input').focus();
+  setTimeout(()=>document.getElementById('modal-input').focus(),50);
 }
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 function confirmModal(){
   const name=document.getElementById('modal-input').value.trim();
   if(!name) return;
-  if(db.accounts[name]){alert('account already exists');return;}
+  if(db.accounts[name]){alert('Account already exists');return;}
   const t=ts();
-  db.accounts[name]={balance:0,totalDep:0,totalWd:0,history:[],createdTs:t,lastIntTs:t,loan:null};
-  active=name; db.active=name;
+  db.accounts[name]={balance:0,totalDep:0,totalWd:0,history:[],createdTs:t,lastIntTs:t,loan:null,points:0,pointsHistory:[]};
+  active=name;db.active=name;
   save();closeModal();render();
 }
 document.getElementById('modal-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmModal()});
