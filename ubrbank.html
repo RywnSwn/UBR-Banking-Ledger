@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBR Bank — Diamond Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#0f0f1a;--bg3:#141428;--card:#13132a;--card2:#0d0d1e;
+  --border:#1e1e3e;--border2:#2a2a4e;
+  --dia:#64dfdf;--dia2:#3ab8b8;--dia3:#1a7a7a;
+  --gold:#ffd700;--gold2:#c9a800;
+  --acc:#e94560;--acc2:#a02030;
+  --green:#4caf50;--green2:#2d7a30;
+  --txt:#d0d0e8;--txt2:#7070a0;--txt3:#4a4a6a;
+  --font-mono:'Share Tech Mono',monospace;
+  --font-display:'Orbitron',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--font-mono)}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* scanline overlay */
+body::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+  pointer-events:none;z-index:999
+}
+
+.app{max-width:900px;margin:0 auto;padding:1.5rem;width:100%;flex:1}
+
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border2)}
+.logo{font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--dia);letter-spacing:3px;text-shadow:0 0 20px rgba(100,223,223,.3)}
+.logo span{color:var(--txt2);font-size:.6rem;display:block;letter-spacing:4px;font-weight:400;margin-top:2px}
+.header-stats{text-align:right;font-size:.7rem;color:var(--txt2)}
+.header-stats .big{font-size:1.1rem;color:var(--dia);font-family:var(--font-display)}
+
+/* tabs */
+.tabs-section{margin-bottom:1rem}
+.tabs-label{font-size:.6rem;letter-spacing:3px;color:var(--txt3);text-transform:uppercase;margin-bottom:.6rem}
+.tabs-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tab{
+  padding:6px 16px;border-radius:4px;
+  border:1px solid var(--border2);
+  background:transparent;color:var(--txt2);
+  cursor:pointer;font-size:.7rem;font-family:var(--font-mono);
+  letter-spacing:1px;text-transform:uppercase;
+  transition:all .15s;position:relative;
+}
+.tab:hover{border-color:var(--dia3);color:var(--dia)}
+.tab.active{
+  background:var(--dia3);color:var(--dia);
+  border-color:var(--dia2);
+  text-shadow:0 0 8px rgba(100,223,223,.5)
+}
+.tab.has-loan::after{
+  content:'LOAN';position:absolute;top:-6px;right:-4px;
+  font-size:8px;background:var(--gold2);color:#0a0a0f;
+  padding:1px 4px;border-radius:2px;font-weight:700;letter-spacing:1px
+}
+.tab-add{
+  padding:6px 12px;border-radius:4px;
+  border:1px dashed var(--border2);
+  background:transparent;color:var(--txt3);
+  cursor:pointer;font-size:1rem;font-family:var(--font-mono);
+  transition:all .15s
+}
+.tab-add:hover{border-color:var(--gold2);color:var(--gold)}
+
+/* main content */
+.main{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.main.full{grid-template-columns:1fr}
+
+/* panels */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:1.25rem
+}
+.panel-title{
+  font-size:.6rem;letter-spacing:3px;color:var(--txt2);
+  text-transform:uppercase;margin-bottom:1rem;
+  display:flex;align-items:center;gap:8px
+}
+.panel-title::before{content:'//';color:var(--dia3)}
+
+/* stat cards */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;grid-column:1/-1}
+.stat{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:4px;padding:12px
+}
+.stat-label{font-size:.6rem;letter-spacing:2px;color:var(--txt2);text-transform:uppercase;margin-bottom:6px}
+.stat-val{font-size:1.3rem;font-family:var(--font-display);font-weight:700}
+.stat-val.dia{color:var(--dia);text-shadow:0 0 10px rgba(100,223,223,.2)}
+.stat-val.acc{color:var(--acc)}
+.stat-sub{font-size:.65rem;color:var(--txt2);margin-top:4px}
+.interest-tag{
+  display:inline-block;margin-top:4px;
+  font-size:.6rem;padding:2px 8px;border-radius:20px;
+  background:rgba(76,175,80,.1);color:var(--green);
+  border:1px solid rgba(76,175,80,.2);letter-spacing:1px
+}
+
+/* forms */
+.field{margin-bottom:.75rem}
+.field label{display:block;font-size:.6rem;letter-spacing:2px;color:var(--txt2);text-transform:uppercase;margin-bottom:6px}
+input[type=number],input[type=text]{
+  width:100%;background:var(--card2);
+  border:1px solid var(--border2);border-radius:4px;
+  padding:9px 12px;color:var(--txt);font-family:var(--font-mono);
+  font-size:.85rem;outline:none;transition:border .15s
+}
+input:focus{border-color:var(--dia2)}
+input::placeholder{color:var(--txt3)}
+
+.btn{
+  width:100%;padding:10px;border-radius:4px;border:none;
+  cursor:pointer;font-family:var(--font-display);font-size:.65rem;
+  font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  transition:all .15s
+}
+.btn-deposit{background:var(--dia3);color:var(--dia);border:1px solid var(--dia2)}
+.btn-deposit:hover{background:var(--dia2);color:#0a0a0f}
+.btn-withdraw{background:transparent;border:1px solid var(--acc2);color:var(--acc)}
+.btn-withdraw:hover{background:var(--acc2);color:var(--txt)}
+.btn-loan{background:rgba(255,215,0,.1);border:1px solid var(--gold2);color:var(--gold)}
+.btn-loan:hover{background:var(--gold2);color:#0a0a0f}
+.btn-repay{background:transparent;border:1px solid var(--gold2);color:var(--gold)}
+.btn-repay:hover{background:var(--gold2);color:#0a0a0f}
+.btn-danger{background:transparent;border:1px solid var(--acc2);color:var(--acc2);font-size:.6rem;padding:6px}
+.btn-danger:hover{border-color:var(--acc);color:var(--acc)}
+
+/* loan panel */
+.loan-block{
+  background:rgba(255,215,0,.03);border:1px solid rgba(255,215,0,.15);
+  border-radius:4px;padding:12px;margin-bottom:1rem;grid-column:1/-1
+}
+.loan-block-title{font-size:.6rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.loan-detail{font-size:.8rem;color:var(--txt);margin-bottom:4px}
+.loan-owed{font-size:1.1rem;font-family:var(--font-display);color:var(--gold);margin:6px 0}
+.loan-warning{font-size:.65rem;color:var(--acc);margin-top:4px}
+
+/* history */
+.history-wrap{overflow-y:auto;max-height:240px}
+.history-wrap::-webkit-scrollbar{width:3px}
+.history-wrap::-webkit-scrollbar-track{background:var(--card2)}
+.history-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.h-row{
+  display:grid;grid-template-columns:auto 1fr auto auto;
+  gap:8px;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:.75rem
+}
+.h-row:last-child{border-bottom:none}
+.h-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.h-dot.dep{background:var(--dia)}
+.h-dot.wd{background:var(--acc)}
+.h-dot.int{background:var(--gold)}
+.h-dot.loan{background:var(--gold);opacity:.6}
+.h-dot.repay{background:var(--acc);opacity:.6}
+.h-label{color:var(--txt)}
+.h-amt{text-align:right;font-family:var(--font-display);font-size:.7rem}
+.h-amt.pos{color:var(--dia)}
+.h-amt.neg{color:var(--acc)}
+.h-amt.gold{color:var(--gold)}
+.h-date{color:var(--txt3);font-size:.65rem;text-align:right;white-space:nowrap}
+.empty-msg{color:var(--txt3);font-size:.75rem;text-align:center;padding:2rem}
+
+/* modal */
+.modal-bg{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.8);z-index:1000;
+  align-items:center;justify-content:center
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:8px;padding:1.5rem;min-width:300px;
+  box-shadow:0 0 40px rgba(100,223,223,.05)
+}
+.modal h3{font-family:var(--font-display);font-size:.85rem;color:var(--dia);margin-bottom:1rem;letter-spacing:2px}
+.modal-btns{display:flex;gap:8px;margin-top:1rem}
+.modal-btns button{flex:1;padding:10px;border-radius:4px;cursor:pointer;font-family:var(--font-display);font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .15s}
+.modal-confirm{background:var(--dia3);color:var(--dia);border:1px solid var(--dia2)}
+.modal-confirm:hover{background:var(--dia2);color:#0a0a0f}
+.modal-cancel{background:transparent;border:1px solid var(--border2);color:var(--txt2)}
+.modal-cancel:hover{border-color:var(--acc2);color:var(--acc)}
+
+/* export/import */
+.toolbar{display:flex;gap:8px;margin-bottom:1rem;justify-content:flex-end}
+.tool-btn{
+  padding:5px 12px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);
+  font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+  background:transparent;border:1px solid var(--border2);color:var(--txt2);transition:all .15s
+}
+.tool-btn:hover{border-color:var(--dia3);color:var(--dia)}
+
+.no-account{
+  grid-column:1/-1;text-align:center;padding:4rem 2rem;
+  color:var(--txt2);font-size:.85rem
+}
+.no-account .big{font-family:var(--font-display);font-size:1.5rem;color:var(--txt3);margin-bottom:1rem}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      ◆ UBR BANK
+      <span>universal block reserve · diamond ledger</span>
+    </div>
+    <div class="header-stats">
+      <div id="total-accounts" style="margin-bottom:4px"></div>
+      <div id="total-diamonds"></div>
+    </div>
+  </div>
+
+  <div class="tabs-section">
+    <div class="tabs-label">// player accounts</div>
+    <div class="tabs-row" id="tabs"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" onclick="exportData()">export save</button>
+    <button class="tool-btn" onclick="document.getElementById('import-file').click()">import save</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+
+  <div class="main" id="main-content"></div>
+</div>
+
+<!-- modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">add player</h3>
+    <div class="field">
+      <label>player name</label>
+      <input type="text" id="modal-input" placeholder="enter username" autocomplete="off" />
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">cancel</button>
+      <button class="modal-confirm" onclick="confirmModal()">confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const INTEREST_RATE = 0.03;
+const LOAN_RATE = 0.05;
+const INTEREST_DAYS = 3;
+const STORAGE_KEY = 'ubr_bank_v3';
+
+function load(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{accounts:{},active:null}}
+  catch(e){return{accounts:{},active:null}}
+}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(db))}
+
+let db = load();
+let active = db.active || null;
+
+function ts(){return Date.now()}
+function daysElapsed(t){return Math.floor((ts()-t)/86400000)}
+
+function applyInterest(acc){
+  if(!acc.lastIntTs) acc.lastIntTs = acc.createdTs||ts();
+  const d = daysElapsed(acc.lastIntTs);
+  const periods = Math.floor(d/INTEREST_DAYS);
+  if(periods>0 && acc.balance>0){
+    for(let i=0;i<periods;i++){
+      const g = Math.floor(acc.balance*INTEREST_RATE);
+      if(g>0){
+        acc.balance+=g;
+        acc.history.unshift({t:'interest',a:g,ts:ts(),note:'3% interest'});
+      }
+    }
+    acc.lastIntTs+=periods*INTEREST_DAYS*86400000;
+  }
+  if(acc.loan&&acc.loan.on){
+    if(!acc.loan.lastTs) acc.loan.lastTs=acc.loan.startTs;
+    const ld=daysElapsed(acc.loan.lastTs);
+    if(ld>0){
+      for(let i=0;i<ld;i++){
+        const f=Math.floor(acc.loan.rem*LOAN_RATE);
+        acc.loan.rem+=f;
+      }
+      acc.loan.lastTs+=ld*86400000;
+    }
+  }
+  return acc;
+}
+
+function daysUntilInt(acc){
+  if(!acc.lastIntTs) return INTEREST_DAYS;
+  const d=daysElapsed(acc.lastIntTs)%INTEREST_DAYS;
+  return d===0?0:INTEREST_DAYS-d;
+}
+
+function totalBalance(){
+  return Object.values(db.accounts).reduce((s,a)=>s+a.balance,0);
+}
+
+function renderHeader(){
+  const names=Object.keys(db.accounts);
+  document.getElementById('total-accounts').textContent=`${names.length} account${names.length!==1?'s':''}`;
+  document.getElementById('total-diamonds').innerHTML=`<span class="big">◆ ${totalBalance().toLocaleString()}</span> total reserves`;
+}
+
+function renderTabs(){
+  const el=document.getElementById('tabs');
+  let html='';
+  Object.keys(db.accounts).forEach(n=>{
+    const acc=db.accounts[n];
+    const hasLoan=acc.loan&&acc.loan.on;
+    html+=`<button class="tab${active===n?' active':''}${hasLoan?' has-loan':''}" onclick="selectTab('${n}')">${n}</button>`;
+  });
+  html+=`<button class="tab-add" onclick="openModal()" title="add player">+</button>`;
+  el.innerHTML=html;
+}
+
+function selectTab(n){active=n;db.active=n;save();render()}
+
+function render(){
+  renderHeader();
+  renderTabs();
+  const mc=document.getElementById('main-content');
+  const names=Object.keys(db.accounts);
+
+  if(!names.length){
+    mc.innerHTML=`<div class="no-account"><div class="big">◆ 0</div>no accounts yet — click + to add a player</div>`;
+    return;
+  }
+  if(!active||!db.accounts[active]) active=names[0];
+
+  let acc=JSON.parse(JSON.stringify(db.accounts[active]));
+  acc=applyInterest(acc);
+  db.accounts[active]=acc;
+  save();
+
+  const dLeft=daysUntilInt(acc);
+  const nextGain=Math.floor(acc.balance*INTEREST_RATE);
+  const hasLoan=acc.loan&&acc.loan.on;
+
+  let loanHTML='';
+  if(hasLoan){
+    loanHTML=`
+    <div class="loan-block">
+      <div class="loan-block-title">// active loan</div>
+      <div class="loan-detail">original: ◆ ${acc.loan.orig.toLocaleString()} — issued ${new Date(acc.loan.startTs).toLocaleDateString()}</div>
+      <div class="loan-owed">◆ ${acc.loan.rem.toLocaleString()} currently owed</div>
+      <div class="loan-warning">accruing 5% per real day until repaid</div>
+      <button class="btn btn-repay" style="margin-top:10px;max-width:200px" onclick="repayLoan()">repay full loan</button>
+    </div>`;
+  }
+
+  let loanFormHTML='';
+  if(!hasLoan){
+    loanFormHTML=`
+    <div class="panel" style="grid-column:1/-1">
+      <div class="panel-title">issue loan</div>
+      <div class="field">
+        <label>loan amount (diamonds)</label>
+        <input type="number" id="loan-amt" placeholder="0" min="1" />
+      </div>
+      <button class="btn btn-loan" onclick="doLoan()">issue loan — 5%/day ◆</button>
+    </div>`;
+  }
+
+  const histHTML=acc.history.length?acc.history.map(h=>{
+    let cls='',dotCls='',sign='',label='';
+    if(h.t==='deposit'){cls='pos';dotCls='dep';sign='+';label='deposit'}
+    else if(h.t==='withdraw'){cls='neg';dotCls='wd';sign='-';label='withdraw'}
+    else if(h.t==='interest'){cls='gold';dotCls='int';sign='+';label='interest'}
+    else if(h.t==='loan'){cls='gold';dotCls='loan';sign='';label='loan issued'}
+    else if(h.t==='repay'){cls='neg';dotCls='repay';sign='-';label='repaid'}
+    return `<div class="h-row">
+      <div class="h-dot ${dotCls}"></div>
+      <div class="h-label">${label}${h.note&&h.t!=='deposit'&&h.t!=='withdraw'?` — ${h.note}`:''}</div>
+      <div class="h-amt ${cls}">${sign}◆${h.a.toLocaleString()}</div>
+      <div class="h-date">${new Date(h.ts).toLocaleDateString()}</div>
+    </div>`;
+  }).join(''):`<div class="empty-msg">no transactions yet</div>`;
+
+  mc.innerHTML=`
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-label">balance</div>
+        <div class="stat-val dia">◆ ${acc.balance.toLocaleString()}</div>
+        <div class="stat-sub">${dLeft===0?'interest due today':`next interest in ${dLeft} day${dLeft!==1?'s':''}`}</div>
+        ${nextGain>0?`<div class="interest-tag">+${nextGain} dia in ${dLeft===0?0:dLeft}d</div>`:''}
+      </div>
+      <div class="stat">
+        <div class="stat-label">total deposited</div>
+        <div class="stat-val">◆ ${acc.totalDep.toLocaleString()}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">total withdrawn</div>
+        <div class="stat-val acc">◆ ${acc.totalWd.toLocaleString()}</div>
+      </div>
+    </div>
+    ${loanHTML}
+    <div class="panel">
+      <div class="panel-title">deposit</div>
+      <div class="field">
+        <label>amount (diamonds)</label>
+        <input type="number" id="dep-amt" placeholder="0" min="1" />
+      </div>
+      <button class="btn btn-deposit" onclick="doDeposit()">deposit ◆</button>
+    </div>
+    <div class="panel">
+      <div class="panel-title">withdraw</div>
+      <div class="field">
+        <label>amount (diamonds)</label>
+        <input type="number" id="wd-amt" placeholder="0" min="1" />
+      </div>
+      <button class="btn btn-withdraw" onclick="doWithdraw()">withdraw ◆</button>
+    </div>
+    ${loanFormHTML}
+    <div class="panel" style="grid-column:1/-1">
+      <div class="panel-title" style="justify-content:space-between">
+        <span>transaction history</span>
+        <button class="btn btn-danger" onclick="deleteAccount()" style="width:auto;padding:4px 10px">delete account</button>
+      </div>
+      <div class="history-wrap">${histHTML}</div>
+    </div>
+  `;
+}
+
+function doDeposit(){
+  const v=parseInt(document.getElementById('dep-amt').value);
+  if(!v||v<1) return;
+  const acc=db.accounts[active];
+  acc.balance+=v; acc.totalDep+=v;
+  acc.history.unshift({t:'deposit',a:v,ts:ts()});
+  save();render();
+}
+
+function doWithdraw(){
+  const v=parseInt(document.getElementById('wd-amt').value);
+  if(!v||v<1) return;
+  const acc=db.accounts[active];
+  if(v>acc.balance){alert('not enough diamonds');return;}
+  acc.balance-=v; acc.totalWd+=v;
+  acc.history.unshift({t:'withdraw',a:v,ts:ts()});
+  save();render();
+}
+
+function doLoan(){
+  const v=parseInt(document.getElementById('loan-amt').value);
+  if(!v||v<1) return;
+  const acc=db.accounts[active];
+  if(acc.loan&&acc.loan.on){alert('already has an active loan');return;}
+  acc.loan={on:true,orig:v,rem:v,startTs:ts(),lastTs:ts()};
+  acc.balance+=v;
+  acc.history.unshift({t:'loan',a:v,ts:ts(),note:'5%/day loan'});
+  save();render();
+}
+
+function repayLoan(){
+  const acc=db.accounts[active];
+  if(!acc.loan||!acc.loan.on) return;
+  const owed=acc.loan.rem;
+  if(owed>acc.balance){alert(`need ◆${owed.toLocaleString()} but balance is ◆${acc.balance.toLocaleString()}`);return;}
+  acc.balance-=owed; acc.totalWd+=owed;
+  acc.history.unshift({t:'repay',a:owed,ts:ts(),note:'loan fully repaid'});
+  acc.loan.on=false;
+  save();render();
+}
+
+function deleteAccount(){
+  if(!confirm(`permanently delete ${active}?`)) return;
+  delete db.accounts[active];
+  const rem=Object.keys(db.accounts);
+  active=rem.length?rem[0]:null;
+  db.active=active;
+  save();render();
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`ubr_bank_save_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imported=JSON.parse(ev.target.result);
+      if(!imported.accounts) throw new Error('invalid');
+      if(!confirm('this will replace all current data. continue?')) return;
+      db=imported;
+      active=db.active||Object.keys(db.accounts)[0]||null;
+      save();render();
+    }catch(err){alert('invalid save file');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function openModal(){
+  document.getElementById('modal-input').value='';
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-input').focus();
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function confirmModal(){
+  const name=document.getElementById('modal-input').value.trim();
+  if(!name) return;
+  if(db.accounts[name]){alert('account already exists');return;}
+  const t=ts();
+  db.accounts[name]={balance:0,totalDep:0,totalWd:0,history:[],createdTs:t,lastIntTs:t,loan:null};
+  active=name; db.active=name;
+  save();closeModal();render();
+}
+document.getElementById('modal-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmModal()});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
+
+render();
+</script>
+</body>
+</html>
